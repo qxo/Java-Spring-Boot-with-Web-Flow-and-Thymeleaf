@@ -3,6 +3,8 @@ package com.example.demo.handlers;
 import org.springframework.binding.message.MessageBuilder;
 import org.springframework.binding.message.MessageContext;
 import org.springframework.stereotype.Component;
+import org.springframework.webflow.core.collection.MutableAttributeMap;
+import org.springframework.webflow.execution.RequestContext;
 
 import com.example.demo.models.BillingInfo;
 import com.example.demo.models.PersonalInfo;
@@ -39,6 +41,20 @@ public class RegisterHandler {
 		return transitionValue;
 	}
 
+	//https://xpadro.com/2013/04/communication-in-spring-webflow-2.html
+	public String validateAjax(RequestContext flowRequestContext, MessageContext context) {
+	    System.out.println("===>validateAjax");
+	    final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
+	   
+	    Integer num = (Integer)flowScope.get("xNum");
+	    if (num == null) {
+	        num  = 0;
+	    }
+	    num = num + 1;
+	    flowScope.put("xNum", num);
+	    flowRequestContext.getRequestScope().put("testVar", "ABC:"+num);
+	    return null;
+	}
 	public String validatePersonalInfo(PersonalInfo personalInfo, MessageContext error) {
 		String transitionValue = "success";
 

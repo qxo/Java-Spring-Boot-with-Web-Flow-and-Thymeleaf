@@ -14,8 +14,15 @@
 	</on-start>
 
 	<!-- is the start state -->
-	<view-state id="personal" view="flows/register/signup-personal" model="personalInfo">
-		<transition on="billing" to="validatePersonal" />
+	<view-state id="personal"  view="flows/register/signup-personal" model="personalInfo">
+         <transition on="billing" to="validatePersonal" />
+         <transition on="validateAjax1" validate="false" >
+             <evaluate expression="registerHandler.validateAjax(flowRequestContext, messageContext)" />
+             <render fragments="hotdata"></render>
+        </transition>
+        <transition on="validateAjax2" validate="false" >
+             <evaluate expression="registerHandler.validateAjax(flowRequestContext, messageContext)" />
+        </transition>
 		<on-exit>
 			<evaluate expression="registerHandler.addPersonalInfo(flowScope.registerModel, personalInfo)"></evaluate>
 		</on-exit>
