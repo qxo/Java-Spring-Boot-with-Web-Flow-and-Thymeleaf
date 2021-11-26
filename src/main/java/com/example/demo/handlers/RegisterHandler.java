@@ -1,9 +1,15 @@
 package com.example.demo.handlers;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.springframework.binding.message.MessageBuilder;
 import org.springframework.binding.message.MessageContext;
 import org.springframework.stereotype.Component;
+import org.springframework.webflow.context.ExternalContext;
 import org.springframework.webflow.core.collection.MutableAttributeMap;
+import org.springframework.webflow.definition.FlowDefinition;
+import org.springframework.webflow.definition.StateDefinition;
 import org.springframework.webflow.execution.RequestContext;
 
 import com.example.demo.models.BillingInfo;
@@ -55,6 +61,33 @@ public class RegisterHandler {
 	    flowRequestContext.getRequestScope().put("testVar", "ABC:"+num);
 	    return null;
 	}
+	
+	   public String ajax3(RequestContext flowRequestContext, MessageContext context) throws IOException {
+	        System.out.println("===>ajax3");
+	        
+	        final FlowDefinition activeFlow = flowRequestContext.getActiveFlow();
+	          
+	        final StateDefinition state = activeFlow.getState("personal");
+	     
+	        final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
+	       
+	        final String key = "ajax3Num";
+            Integer num = (Integer)flowScope.get(key);
+	        if (num == null) {
+	            num  = 0;
+	        }
+	        num = num + 1;
+	        flowScope.put(key, num);
+	        flowRequestContext.getRequestScope().put("testVar", "ajax3:"+num);
+	        final ExternalContext externalContext = flowRequestContext.getExternalContext();
+            
+	        final Writer writer = externalContext.getResponseWriter();
+	        writer.write("on ajax3");
+	        externalContext.recordResponseComplete();
+	        
+	        
+	        return null;
+	    }
 	public String validatePersonalInfo(PersonalInfo personalInfo, MessageContext error) {
 		String transitionValue = "success";
 
