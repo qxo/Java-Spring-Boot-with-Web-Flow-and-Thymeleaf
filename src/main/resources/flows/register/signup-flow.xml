@@ -26,6 +26,9 @@
         <transition on="ajax3" validate="false" >
              <evaluate expression="registerHandler.ajax3(flowRequestContext, messageContext)" />
         </transition>
+        <transition on="ajax4" validate="false" >
+             <evaluate expression="registerHandler.ajax4(flowRequestContext, messageContext)" />
+        </transition>
 		<on-exit>
 			<evaluate expression="registerHandler.addPersonalInfo(flowScope.registerModel, personalInfo)"></evaluate>
 		</on-exit>

@@ -10,6 +10,7 @@ import org.springframework.webflow.context.ExternalContext;
 import org.springframework.webflow.core.collection.MutableAttributeMap;
 import org.springframework.webflow.definition.FlowDefinition;
 import org.springframework.webflow.definition.StateDefinition;
+import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
 
 import com.example.demo.models.BillingInfo;
@@ -47,47 +48,70 @@ public class RegisterHandler {
 		return transitionValue;
 	}
 
-	//https://xpadro.com/2013/04/communication-in-spring-webflow-2.html
-	public String validateAjax(RequestContext flowRequestContext, MessageContext context) {
-	    System.out.println("===>validateAjax");
-	    final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
-	   
-	    Integer num = (Integer)flowScope.get("xNum");
-	    if (num == null) {
-	        num  = 0;
-	    }
-	    num = num + 1;
-	    flowScope.put("xNum", num);
-	    flowRequestContext.getRequestScope().put("testVar", "ABC:"+num);
-	    return null;
+	// https://xpadro.com/2013/04/communication-in-spring-webflow-2.html
+	public String validateAjax(RequestContext flowRequestContext, MessageContext context) throws IOException {
+		System.out.println("===>validateAjax");
+		final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
+
+		final String id = flowRequestContext.getCurrentEvent().getId();
+		Integer num = (Integer) flowScope.get("xNum");
+		if (num == null) {
+			num = 0;
+		}
+		num = num + 1;
+		flowScope.put("xNum", num);
+		flowRequestContext.getRequestScope().put("testVar", id+":"+ num);
+		return null;
 	}
+
+	public String ajax3(RequestContext flowRequestContext, MessageContext context) throws IOException {
+		System.out.println("===>ajax3");
+
+		final FlowDefinition activeFlow = flowRequestContext.getActiveFlow();
+
+		final StateDefinition state = activeFlow.getState("personal");
+
+		final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
+
+		final String key = "ajax3Num";
+		Integer num = (Integer) flowScope.get(key);
+		if (num == null) {
+			num = 0;
+		}
+		num = num + 1;
+		flowScope.put(key, num);
+		flowRequestContext.getRequestScope().put("testVar", "ajax3:" + num);
+		final ExternalContext externalContext = flowRequestContext.getExternalContext();
+
+		final Writer writer = externalContext.getResponseWriter();
+		writer.write("on ajax3:" + num);
+		externalContext.recordResponseComplete();
+
+		return null;
+	}
+
 	
-	   public String ajax3(RequestContext flowRequestContext, MessageContext context) throws IOException {
-	        System.out.println("===>ajax3");
-	        
-	        final FlowDefinition activeFlow = flowRequestContext.getActiveFlow();
-	          
-	        final StateDefinition state = activeFlow.getState("personal");
-	     
-	        final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
-	       
-	        final String key = "ajax3Num";
-            Integer num = (Integer)flowScope.get(key);
-	        if (num == null) {
-	            num  = 0;
-	        }
-	        num = num + 1;
-	        flowScope.put(key, num);
-	        flowRequestContext.getRequestScope().put("testVar", "ajax3:"+num);
-	        final ExternalContext externalContext = flowRequestContext.getExternalContext();
-            
-	        final Writer writer = externalContext.getResponseWriter();
-	        writer.write("on ajax3");
-	        externalContext.recordResponseComplete();
-	        
-	        
-	        return null;
-	    }
+	public String ajax4(RequestContext flowRequestContext, MessageContext context) throws IOException {
+		final String currentState = flowRequestContext.getCurrentState().getId();
+		final Event currentEvent = flowRequestContext.getCurrentEvent();
+		System.out.println("===>ajax4: " + currentState + "\tcurrentEvent: " + currentEvent);
+
+		final MutableAttributeMap<Object> flowScope = flowRequestContext.getFlowScope();
+
+		final String key = "ajax4Num";
+		Integer num = (Integer) flowScope.get(key);
+		if (num == null) {
+			num = 0;
+		}
+		num = num + 1;
+		flowScope.put(key, num);
+		final MutableAttributeMap<Object> requestScope = flowRequestContext.getRequestScope();
+		requestScope.put("testVar", "ajax4:" + num);
+		requestScope.put("other1", true);
+		return null;
+	}
+
+
 	public String validatePersonalInfo(PersonalInfo personalInfo, MessageContext error) {
 		String transitionValue = "success";
 
